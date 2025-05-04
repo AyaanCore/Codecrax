@@ -22,7 +22,7 @@
     }
     h1 {
       text-align: center;
-      color: var(--link-heading);
+      color: #6cf;
       margin-bottom: 2rem;
     }
     video, iframe {
@@ -45,64 +45,84 @@
     </video>
     <iframe id="teamPDF"></iframe>
   </div>
-<script>
-  const urlParams = new URLSearchParams(window.location.search);
-  const teamName = urlParams.get('name');
 
-  if (teamName) {
-    const safeName = teamName.replace(/[^a-zA-Z0-9-_]/g, "_");
-    document.getElementById('teamName').textContent = teamName;
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const teamName = urlParams.get('name');
 
-    const videoPath = `data/${safeName}.mp4`;
-    const pdfPath = `PDF/${safeName}.pdf`;
+    if (teamName) {
+      const cleanTeamName = teamName.trim().toLowerCase().replace(/[^a-z0-9]/gi, '');
+      document.getElementById('teamName').textContent = teamName;
 
-    const videoElement = document.getElementById('teamVideo');
-    const videoSource = videoElement.querySelector('source');
+      Promise.all([
+        fetch('videos.json').then(res => res.json()),
+        fetch('pdfs.json').then(res => res.json())
+      ]).then(([videoFiles, pdfFiles]) => {
+        const videoElement = document.getElementById('teamVideo');
+        const videoSource = videoElement.querySelector('source');
 
-    const pdfElement = document.getElementById('teamPDF');
-
-    // Check if video exists
-    fetch(videoPath, { method: 'HEAD' })
-      .then(response => {
-        if (response.ok) {
-          videoSource.src = videoPath;
+        // Find best matching video
+        const matchedVideo = findBestMatch(videoFiles, cleanTeamName, 0.5);
+        if (matchedVideo) {
+          videoSource.src = `data/${matchedVideo}`;
           videoElement.load();
         } else {
           showMessage(videoElement, "Video not submitted.");
         }
-      })
-      .catch(() => {
-        showMessage(videoElement, "Video not submitted.");
-      });
 
-    // Check if PDF exists
-    fetch(pdfPath, { method: 'HEAD' })
-      .then(response => {
-        if (response.ok) {
-          pdfElement.src = pdfPath;
+        // Find best matching PDF/PPTX
+        const matchedDoc = findBestMatch(pdfFiles, cleanTeamName, 0.5);
+        const docFrame = document.getElementById('teamPDF');
+        if (matchedDoc) {
+          const ext = matchedDoc.split('.').pop().toLowerCase();
+          if (ext === 'pptx') {
+            const pptUrl = encodeURIComponent(`${location.origin}/PDF/${matchedDoc}`);
+            docFrame.src = `https://view.officeapps.live.com/op/embed.aspx?src=${pptUrl}`;
+          } else {
+            docFrame.src = `PDF/${matchedDoc}`;
+          }
         } else {
-          showMessage(pdfElement, "PDF not submitted.");
+          showMessage(docFrame, "PDF/PPT not submitted.");
         }
-      })
-      .catch(() => {
-        showMessage(pdfElement, "PDF not submitted.");
+      }).catch(error => {
+        console.error("Error loading file lists:", error);
       });
+    } else {
+      document.getElementById('teamName').textContent = "No team specified.";
+    }
 
-  } else {
-    document.getElementById('teamName').textContent = "No team specified.";
-  }
+    function showMessage(element, messageText) {
+      const message = document.createElement('p');
+      message.textContent = messageText;
+      message.style.color = "#f66";
+      message.style.marginBottom = "2rem";
+      message.style.fontSize = "1.1rem";
+      element.replaceWith(message);
+    }
 
-  // Utility function to show message in place of an element
-  function showMessage(element, messageText) {
-    const message = document.createElement('p');
-    message.textContent = messageText;
-    message.style.color = "#f66";
-    message.style.marginBottom = "2rem";
-    message.style.fontSize = "1.1rem";
-    element.replaceWith(message);
-  }
-</script>
+    function findBestMatch(fileList, teamName, threshold = 0.5) {
+      let bestMatch = null;
+      let bestScore = 0;
 
+      for (const file of fileList) {
+        const nameOnly = file.split('.')[0].toLowerCase().replace(/[^a-z0-9]/gi, '');
+        const score = similarity(teamName, nameOnly);
+        if (score >= threshold && score > bestScore) {
+          bestMatch = file;
+          bestScore = score;
+        }
+      }
 
+      return bestMatch;
+    }
+
+    function similarity(a, b) {
+      const setA = new Set(a);
+      const setB = new Set(b);
+      const intersection = [...setA].filter(c => setB.has(c)).length;
+      const averageLength = (a.length + b.length) / 2;
+      return intersection / averageLength;
+    }
+  </script>
 </body>
 </html>
