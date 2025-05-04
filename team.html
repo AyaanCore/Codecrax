@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team Details</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      background-color: #1e1e1e;
+      color: #eaeaea;
+      font-family: 'Source Code Pro', monospace;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 960px;
+      margin: auto;
+      background-color: rgba(40, 40, 40, 0.95);
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
+    }
+    h1 {
+      text-align: center;
+      color: var(--link-heading);
+      margin-bottom: 2rem;
+    }
+    video, iframe {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+    }
+    iframe {
+      height: 500px;
+      border: 2px solid #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 id="teamName">Team</h1>
+    <video id="teamVideo" controls>
+      <source src="" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+    <iframe id="teamPDF"></iframe>
+  </div>
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const teamName = urlParams.get('name');
+
+  if (teamName) {
+    const safeName = teamName.replace(/[^a-zA-Z0-9-_]/g, "_");
+    document.getElementById('teamName').textContent = teamName;
+
+    const videoPath = `data/${safeName}.mp4`;
+    const pdfPath = `PDF/${safeName}.pdf`;
+
+    const videoElement = document.getElementById('teamVideo');
+    const videoSource = videoElement.querySelector('source');
+
+    const pdfElement = document.getElementById('teamPDF');
+
+    // Check if video exists
+    fetch(videoPath, { method: 'HEAD' })
+      .then(response => {
+        if (response.ok) {
+          videoSource.src = videoPath;
+          videoElement.load();
+        } else {
+          showMessage(videoElement, "Video not submitted.");
+        }
+      })
+      .catch(() => {
+        showMessage(videoElement, "Video not submitted.");
+      });
+
+    // Check if PDF exists
+    fetch(pdfPath, { method: 'HEAD' })
+      .then(response => {
+        if (response.ok) {
+          pdfElement.src = pdfPath;
+        } else {
+          showMessage(pdfElement, "PDF not submitted.");
+        }
+      })
+      .catch(() => {
+        showMessage(pdfElement, "PDF not submitted.");
+      });
+
+  } else {
+    document.getElementById('teamName').textContent = "No team specified.";
+  }
+
+  // Utility function to show message in place of an element
+  function showMessage(element, messageText) {
+    const message = document.createElement('p');
+    message.textContent = messageText;
+    message.style.color = "#f66";
+    message.style.marginBottom = "2rem";
+    message.style.fontSize = "1.1rem";
+    element.replaceWith(message);
+  }
+</script>
+
+
+</body>
+</html>
