@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet" />
+    <title>Startpage</title>
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <div class="bg"></div>
+      <div class="maincard">
+        <div class="content">
+          
+          <div id="links" class="links">
+            <section>
+              <h3>EdTech</h3>
+              <ul>
+                <li>Antimatter's</li>
+                <li>Bug_Busters</li>
+                <li>Byte_Busters</li>
+                <li>CodeCrushers</li>
+                <li>codexplo</li>
+                <li>DataDynamos</li>
+                <li>Diverse_Divas</li>
+                <li>Draco</li>
+                <li>Edify</li>
+                <li>EduFabricators</li>
+                <li>Heil_Coders</li>
+                <li>KRATOS</li>
+                <li>Reformers</li>
+                <li>Team Vision 3.0</li>
+                <li>TEAM_SPAM</li>
+                <li>TechMatrix Solvers</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3>Green Tech</h3>
+              <ul>
+                <li>Hack_HORIZON</li>
+                <li>Think_Tanker</li>
+                <li>Code_Cracker</li>
+                <li>CODE_STORM</li>
+                <li>Code_Yodhas</li>
+                <li>CODINGBROTHERS</li>
+                <li>Elite</li>
+                <li>HackBuddy</li>
+                <li>Loopify</li>
+                <li>Rising Coders</li>
+                <li>THE_CRYPTIC_CREW</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3>Web3</h3>
+              <ul>
+                <li>Team_Logicastra</li>
+                <li>Team_Vasiliades</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3>Healthcare</h3>
+              <ul>
+                <li>Krishverse</li>
+                <li>Tech_Teens</li>
+                <li>404 NINJAS</li>
+                <li>Code Reapers</li>
+                <li>CodeCrafters</li>
+                <li>Debug_Thugs</li>
+                <li>FitFusion AI</li>
+                <li>Getch();</li>
+                <li>Hackbuster</li>
+                <li>HEALOSPHERE</li>
+                <li>MindScope-AI</li>
+                <li>NextGen_Wizards</li>
+                <li>OPTIMA</li>
+                <li>Recursive Rebels</li>
+                <li>YuvaWell</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3>Cyber</h3>
+              <ul>
+                <li>Bot_BrahmaX</li>
+                <li>Four Firewalls</li>
+                <li>Pratishtha</li>
+              </ul>
+            </section>
+          </div>
+        </div>
+       
+      </div>
+    </div>
+    <script>
+      // Sanitize team name for URL safety
+      function sanitizeName(name) {
+        return encodeURIComponent(name);
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const listItems = document.querySelectorAll(".links ul li");
+
+        listItems.forEach((li) => {
+          const teamName = li.textContent.trim();
+          const link = document.createElement("a");
+          link.href = `team.html?name=${sanitizeName(teamName)}`;
+          link.textContent = teamName;
+
+          li.textContent = ""; // Clear original text
+          li.appendChild(link); // Insert link
+        });
+      });
+    </script>
+
+  </body>
+</html>
